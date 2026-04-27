@@ -1,10 +1,7 @@
 package rmsbackend.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import rmsbackend.dto.customer.CustomerRequest;
 import rmsbackend.dto.customer.CustomerResponse;
 import rmsbackend.service.CustomerService;
@@ -26,6 +23,11 @@ public class CustomerController {
     @GetMapping
     public List<CustomerResponse> findAllCustomers() {
         return customerService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public CustomerResponse findCustomerById(@PathVariable String id) {
+        return customerService.findById(id);
     }
 
 }

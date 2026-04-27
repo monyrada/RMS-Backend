@@ -32,4 +32,12 @@ public class CustomerServiceImpl implements CustomerService {
                 .map(customerMapper::toResponse)
                 .toList();
     }
+
+    @Override
+    public CustomerResponse findById(String id) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found."));
+        return customerMapper.toResponse(customer);
+    }
+
 }

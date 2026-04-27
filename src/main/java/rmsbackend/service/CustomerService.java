@@ -11,4 +11,6 @@ public interface CustomerService {
 
     List<CustomerResponse> findAll();
 
+    CustomerResponse findById(String id);
+
 }
