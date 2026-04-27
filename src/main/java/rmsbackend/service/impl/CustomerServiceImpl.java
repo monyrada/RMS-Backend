@@ -9,6 +9,8 @@ import rmsbackend.mapper.CustomerMapper;
 import rmsbackend.repository.CustomerRepository;
 import rmsbackend.service.CustomerService;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
@@ -21,5 +23,13 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerMapper.toEntity(request);
 
         return customerMapper.toResponse(customerRepository.save(customer));
+    }
+
+    @Override
+    public List<CustomerResponse> findAll() {
+        return customerRepository.findAll()
+                .stream()
+                .map(customerMapper::toResponse)
+                .toList();
     }
 }
