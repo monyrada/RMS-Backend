@@ -13,4 +13,8 @@ public interface CustomerService {
 
     CustomerResponse findById(String id);
 
+    CustomerResponse update(String id, CustomerRequest request);
+
+    void delete(String id);
+
 }

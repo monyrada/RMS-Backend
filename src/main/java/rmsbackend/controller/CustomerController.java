@@ -1,5 +1,6 @@
 package rmsbackend.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import rmsbackend.dto.customer.CustomerRequest;
@@ -28,6 +29,16 @@ public class CustomerController {
     @GetMapping("/{id}")
     public CustomerResponse findCustomerById(@PathVariable String id) {
         return customerService.findById(id);
+    }
+
+    @PutMapping("/{id}")
+    public CustomerResponse updateCustomer(@PathVariable String id, @Valid @RequestBody CustomerRequest request) {
+        return customerService.update(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteCustomerById(@PathVariable String id) {
+        customerService.delete(id);
     }
 
 }

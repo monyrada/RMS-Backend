@@ -40,4 +40,21 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toResponse(customer);
     }
 
+    @Override
+    public CustomerResponse update(String id, CustomerRequest request) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found."));
+
+        customerMapper.updateEntity(customer, request);
+        return customerMapper.toResponse(customerRepository.save(customer));
+    }
+
+    @Override
+    public void delete(String id) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found."));
+
+        customerRepository.delete(customer);
+    }
+
 }
