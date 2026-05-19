@@ -39,6 +39,7 @@ public class RestaurantTableController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all table data", description = "Get all restaurant table")
     public ResponseEntity<List<RestaurantTableResponse>> findAll() {
         return ResponseEntity.ok(restaurantTableService.findAll());
     }
