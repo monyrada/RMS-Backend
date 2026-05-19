@@ -9,10 +9,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rmsbackend.dto.table.RestaurantTableRequest;
 import rmsbackend.dto.table.RestaurantTableResponse;
 import rmsbackend.service.RestaurantTableService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/tables")
@@ -34,4 +37,12 @@ public class RestaurantTableController {
     public RestaurantTableResponse createTable(@Valid @RequestBody RestaurantTableRequest request) {
         return restaurantTableService.create(request);
     }
+
+    @GetMapping
+    public ResponseEntity<List<RestaurantTableResponse>> findAll() {
+        return ResponseEntity.ok(restaurantTableService.findAll());
+    }
+
+
+
 }

@@ -38,6 +38,14 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
         return mapToResponse(tableRepository.save(table));
     }
 
+    @Override
+    public List<RestaurantTableResponse> findAll() {
+        return tableRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     private RestaurantTableResponse mapToResponse(RestaurantTable table) {
         RestaurantTableResponse response = new RestaurantTableResponse();
         response.setId(table.getId());
@@ -50,11 +58,6 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
         response.setCreatedAt(table.getCreatedAt());
         response.setUpdatedAt(table.getUpdatedAt());
         return response;
-    }
-
-    @Override
-    public List<RestaurantTableResponse> findAll() {
-        return List.of();
     }
 
     @Override
