@@ -21,7 +21,6 @@ public class Ingredient {
 
     @Column(nullable = false, unique = true)
     private String name;
-
     private String unit;
 
     @Enumerated(EnumType.STRING)
@@ -29,6 +28,7 @@ public class Ingredient {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();

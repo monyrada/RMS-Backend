@@ -21,19 +21,16 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    private String name;
     private String categoryId;
-
-    @Column(unique = true)
-    private String itemCode;
-
-    private String image;
-    private Boolean status;
+    private String name;
     private BigDecimal price;
+    private String imageUrl;
+    private Boolean status;
     private String description;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();

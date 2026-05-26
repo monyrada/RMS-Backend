@@ -20,8 +20,8 @@ public class ItemDetails {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    private UUID itemId; //foreign key
-    private UUID ingredientId; //foreign key
+    private String itemId; //foreign key
+    private String ingredientId; //foreign key
     private BigDecimal quantity;
     private String note;
 
