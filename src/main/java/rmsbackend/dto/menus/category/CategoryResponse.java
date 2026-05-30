@@ -9,6 +9,7 @@ public class CategoryResponse {
 
     private String id;
     private String name;
+    private String nameKh;
     private String code;
     private Boolean status;
     private String description;

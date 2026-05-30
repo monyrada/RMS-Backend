@@ -3,7 +3,6 @@ package rmsbackend.domain.menus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -21,6 +20,7 @@ public class Category {
     private String description;
     private Boolean status;
     private String name;
+    private String nameKh;
     private String code;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

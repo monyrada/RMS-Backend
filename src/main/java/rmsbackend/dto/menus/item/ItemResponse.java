@@ -11,5 +11,6 @@ public class ItemResponse {
     private String id;
     private String name;
     private BigDecimal price;
+    private String description;
 
 }
