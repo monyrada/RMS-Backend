@@ -9,6 +9,7 @@ public class ItemRequest {
 
     private String categoryId;
     private String name;
+    private String nameKh;
     private BigDecimal price;
     private String description;
 

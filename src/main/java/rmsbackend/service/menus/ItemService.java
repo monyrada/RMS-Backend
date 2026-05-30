@@ -11,7 +11,6 @@ import rmsbackend.repository.menus.ItemRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +26,9 @@ public class ItemService {
                 .orElseThrow();
 
         Item item = Item.builder()
-                .id(UUID.randomUUID().toString())
                 .categoryId(category.getId())
                 .name(request.getName())
+                .nameKh(request.getNameKh())
                 .price(request.getPrice())
                 .description(request.getDescription())
                 .createdAt(LocalDateTime.now())
@@ -37,14 +36,21 @@ public class ItemService {
 
         itemRepository.save(item);
 
-        return ItemResponse.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .price(item.getPrice())
-                .build();
+        return mapToResponse(item);
     }
 
     public List<ItemResponse> getAll() {
         return List.of();
     }
+
+    private ItemResponse mapToResponse(Item item) {
+        return ItemResponse.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .nameKh(item.getNameKh())
+                .price(item.getPrice())
+                .description(item.getDescription())
+                .build();
+    }
+
 }

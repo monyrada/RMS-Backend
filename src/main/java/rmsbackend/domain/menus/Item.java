@@ -23,6 +23,7 @@ public class Item {
 
     private String categoryId;
     private String name;
+    private String nameKh;
     private BigDecimal price;
     private String imageUrl;
     private Boolean status;
