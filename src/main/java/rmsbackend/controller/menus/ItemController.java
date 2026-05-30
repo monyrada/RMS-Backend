@@ -37,6 +37,13 @@ public class ItemController {
         return ResponseEntity.ok(itemService.getItemById(id));
     }
 
+    @GetMapping("/category/{categoryId}")
+    @Operation(summary = "Get all items by categoryId", description = "Return a item listing data.")
+    public ResponseEntity<List<ItemResponse>> getAllItemsByCategoryId(@PathVariable String categoryId) {
+
+        return ResponseEntity.ok(itemService.getAllItemsByCategoryId(categoryId));
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a item", description = "Return no content.")
     public ResponseEntity<Void> deleteItemById(@PathVariable String id) {

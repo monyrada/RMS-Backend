@@ -40,6 +40,14 @@ public class ItemService {
         return mapToResponse(item);
     }
 
+    public List<ItemResponse> getAllItemsByCategoryId(String categoryId) {
+
+        return itemRepository.findByCategoryId(categoryId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     public ItemResponse getItemById(String id) {
         Item item = itemRepository
                 .findById(id)
