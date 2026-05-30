@@ -21,9 +21,10 @@ public class ItemService {
 
     public ItemResponse create(ItemRequest request) {
 
+        // find category data by categoryId
         Category category = categoryRepository
                 .findById(request.getCategoryId())
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("Category not found with id:" + request.getCategoryId()));
 
         Item item = Item.builder()
                 .categoryId(category.getId())
