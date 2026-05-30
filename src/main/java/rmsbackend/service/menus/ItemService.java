@@ -40,13 +40,17 @@ public class ItemService {
         return mapToResponse(item);
     }
 
-    public List<ItemResponse> getAll() {
-        return List.of();
+    public List<ItemResponse> getAllItems() {
+        return itemRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     private ItemResponse mapToResponse(Item item) {
         return ItemResponse.builder()
                 .id(item.getId())
+                .categoryId(item.getCategoryId())
                 .name(item.getName())
                 .nameKh(item.getNameKh())
                 .price(item.getPrice())

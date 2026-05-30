@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 public class ItemResponse {
 
     private String id;
+    private String categoryId;
     private String name;
     private String nameKh;
     private BigDecimal price;
