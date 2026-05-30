@@ -55,6 +55,10 @@ public class ItemService {
                 .toList();
     }
 
+    public void deleteItemById(String id) {
+        itemRepository.deleteById(id);
+    }
+
     private ItemResponse mapToResponse(Item item) {
         return ItemResponse.builder()
                 .id(item.getId())
