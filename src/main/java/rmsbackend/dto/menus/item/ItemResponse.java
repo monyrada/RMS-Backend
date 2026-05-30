@@ -13,6 +13,8 @@ public class ItemResponse {
     private String name;
     private String nameKh;
     private BigDecimal price;
+    private String imageUrl;
+    private Boolean status;
     private String description;
 
 }

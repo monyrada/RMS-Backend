@@ -40,6 +40,14 @@ public class ItemService {
         return mapToResponse(item);
     }
 
+    public ItemResponse getItemById(String id) {
+        Item item = itemRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Item not found with id:" + id));
+
+        return mapToResponse(item);
+    }
+
     public List<ItemResponse> getAllItems() {
         return itemRepository.findAll()
                 .stream()
@@ -54,6 +62,8 @@ public class ItemService {
                 .name(item.getName())
                 .nameKh(item.getNameKh())
                 .price(item.getPrice())
+                .imageUrl(item.getImageUrl())
+                .status(item.getStatus())
                 .description(item.getDescription())
                 .build();
     }

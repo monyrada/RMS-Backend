@@ -31,5 +31,11 @@ public class ItemController {
         return ResponseEntity.ok(itemService.getAllItems());
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get item by Id", description = "Return a item data.")
+    public ResponseEntity<ItemResponse> getItemById(@PathVariable String id) {
+        return ResponseEntity.ok(itemService.getItemById(id));
+    }
+
 
 }
