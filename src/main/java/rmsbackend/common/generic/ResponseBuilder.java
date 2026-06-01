@@ -1,4 +1,4 @@
-package rmsbackend.common.generic.response;
+package rmsbackend.common.generic;
 
 import java.time.Instant;
 
