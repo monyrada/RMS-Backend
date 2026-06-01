@@ -26,6 +26,16 @@ public class ResponseBuilder {
                 .build();
     }
 
+    public static ApiResponse<Void> respond(StatusCode statusCode) {
+        return ApiResponse.<Void>builder()
+                .code(statusCode.getCode())
+                .message(statusCode.getMessage())
+                .success(true)
+                .data(null)
+                .timestamp(Instant.now())
+                .build();
+    }
+
     public static ApiResponse<Void> error(StatusCode statusCode) {
         return ApiResponse.<Void>builder()
                 .code(statusCode.getCode())

@@ -2,6 +2,7 @@ package rmsbackend.service.menus;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import rmsbackend.common.generic.StatusCode;
 import rmsbackend.domain.menus.Category;
 import rmsbackend.dto.menus.category.CategoryRequest;
 import rmsbackend.dto.menus.category.CategoryResponse;
