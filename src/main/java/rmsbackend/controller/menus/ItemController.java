@@ -5,6 +5,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rmsbackend.common.generic.response.ApiResponse;
+import rmsbackend.common.generic.response.ResponseBuilder;
+import rmsbackend.common.generic.response.StatusCode;
 import rmsbackend.dto.menus.item.ItemRequest;
 import rmsbackend.dto.menus.item.ItemResponse;
 import rmsbackend.service.menus.ItemService;
@@ -21,27 +24,42 @@ public class ItemController {
 
     @PostMapping
     @Operation(summary = "Create a new item", description = "Create a item")
-    public ResponseEntity<ItemResponse> createItem(@RequestBody ItemRequest request) {
-        return ResponseEntity.ok(itemService.create(request));
+    public ApiResponse<ItemResponse> createItem(@RequestBody ItemRequest request) {
+        ItemResponse item = itemService.create(request);
+
+        return ResponseBuilder.respond(StatusCode.CREATED, item);
     }
 
     @GetMapping
     @Operation(summary = "Get all items", description = "Return item data as list")
-    public ResponseEntity<List<ItemResponse>> getAllItems() {
-        return ResponseEntity.ok(itemService.getAllItems());
+    public ApiResponse<List<ItemResponse>> getAllItems() {
+        List<ItemResponse> itemsList = itemService.getAllItems();
+
+        if (itemsList.isEmpty()) {
+            return ResponseBuilder.respond(StatusCode.NOT_FOUND, "Record not found!");
+        }
+
+        return ResponseBuilder.respond(StatusCode.SUCCESS, itemsList);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get item by Id", description = "Return a item data.")
-    public ResponseEntity<ItemResponse> getItemById(@PathVariable String id) {
-        return ResponseEntity.ok(itemService.getItemById(id));
+    public ApiResponse<ItemResponse> getItemById(@PathVariable String id) {
+        ItemResponse itemResponse = itemService.getItemById(id);
+
+        return ResponseBuilder.respond(StatusCode.SUCCESS, itemResponse);
     }
 
     @GetMapping("/category/{categoryId}")
     @Operation(summary = "Get all items by categoryId", description = "Return a item listing data.")
-    public ResponseEntity<List<ItemResponse>> getAllItemsByCategoryId(@PathVariable String categoryId) {
+    public ApiResponse<List<ItemResponse>> getAllItemsByCategoryId(@PathVariable String categoryId) {
+        List<ItemResponse> itemsList = itemService.getAllItemsByCategoryId(categoryId);
 
-        return ResponseEntity.ok(itemService.getAllItemsByCategoryId(categoryId));
+        if (itemsList.isEmpty()) {
+            return ResponseBuilder.respond(StatusCode.NOT_FOUND, "Record not found!");
+        }
+
+        return ResponseBuilder.respond(StatusCode.SUCCESS, itemsList);
     }
 
     @DeleteMapping("/{id}")
