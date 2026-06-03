@@ -1,11 +1,10 @@
 package rmsbackend.service.menus;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import rmsbackend.common.generic.PaginationRequest;
-import rmsbackend.common.generic.StatusCode;
 import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.menus.Category;
 import rmsbackend.dto.menus.category.CategoryRequest;
@@ -17,6 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryService {
 
     final private CategoryRepository categoryRepository;
@@ -71,21 +71,18 @@ public class CategoryService {
         return mapToResponse(category);
     }
 
-//    public List<CategoryResponse> getAllCategories(PaginationRequest pagination) {
-//        return categoryRepository.findAll()
-//                .stream()
-//                .map(this::mapToResponse)
-//                .toList();
-//    }
-
     public List<CategoryResponse> getAllCategories(PaginationRequest pagination) {
         Pageable pageable = PaginationUtils.pageable(pagination);
 
-        return categoryRepository
+        var results = categoryRepository
                 .findAll(pageable)
                 .map(this::mapToResponse)
                 .stream()
                 .toList();
+
+        if (results.isEmpty()) log.info("No categories found");
+
+        return results;
     }
 
     public void deleteCategory(String id) {
