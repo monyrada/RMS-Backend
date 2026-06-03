@@ -71,17 +71,12 @@ public class CategoryService {
         return mapToResponse(category);
     }
 
-    public List<CategoryResponse> getAllCategories(PaginationRequest pagination) {
+    public Page<CategoryResponse> getAllCategories(PaginationRequest pagination) {
         Pageable pageable = PaginationUtils.pageable(pagination);
 
-        var results = categoryRepository
-                .findAll(pageable)
-                .map(this::mapToResponse)
-                .stream()
-                .toList();
+        var results = categoryRepository.findAll(pageable).map(this::mapToResponse);
 
-        if (results.isEmpty()) log.info("No categories found");
-
+        log.info("Query categories completed!");
         return results;
     }
 

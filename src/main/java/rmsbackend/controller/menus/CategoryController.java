@@ -46,22 +46,6 @@ public class CategoryController {
         return ResponseBuilder.respond(StatusCode.UPDATED, category);
     }
 
-//    @GetMapping
-//    @Operation(summary = "Get all categories", description = "Get all categories")
-//    public ApiResponse<Page<CategoryResponse>> getAllCategories(@Valid PaginationRequest pagination) {
-////        Page categories = categoryService.getAllCategories(pagination);
-////
-////        if (categories.isEmpty()) {
-////            return ResponseBuilder.respond(StatusCode.NOT_FOUND, "Record not found!");
-////        }
-//
-//        return ResponseBuilder.respond(
-//                StatusCode.SUCCESS,
-//                categoryService.getAllCategories(pagination)
-//        );
-//        //return ResponseBuilder.respond(StatusCode.SUCCESS, categories);
-//    }
-
     @GetMapping
     @Operation(summary = "Get all categories", description = "Retrieve paginated categories")
     @Parameters({
@@ -71,8 +55,7 @@ public class CategoryController {
             @Parameter(name = "order", description = "Order to sort by", example = "asc")
     })
     public RespondDTO getAllCategories(PaginationRequest pagination) {
-
-        List<CategoryResponse> categories = categoryService.getAllCategories(pagination);
+        Page<CategoryResponse> categories = categoryService.getAllCategories(pagination);
 
         if (categories.isEmpty()) {
             return JSONRespond.respond(null, StatusCode.NOT_FOUND, "Record not found!");
