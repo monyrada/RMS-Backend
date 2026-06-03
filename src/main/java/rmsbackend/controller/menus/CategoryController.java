@@ -1,13 +1,18 @@
 package rmsbackend.controller.menus;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
 import rmsbackend.common.generic.ApiResponse;
+import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.generic.ResponseBuilder;
 import rmsbackend.common.generic.StatusCode;
+import rmsbackend.common.util.JSONRespond;
+import rmsbackend.dto.RespondDTO;
 import rmsbackend.dto.menus.category.CategoryRequest;
 import rmsbackend.dto.menus.category.CategoryResponse;
 import rmsbackend.service.menus.CategoryService;
@@ -41,16 +46,39 @@ public class CategoryController {
         return ResponseBuilder.respond(StatusCode.UPDATED, category);
     }
 
+//    @GetMapping
+//    @Operation(summary = "Get all categories", description = "Get all categories")
+//    public ApiResponse<Page<CategoryResponse>> getAllCategories(@Valid PaginationRequest pagination) {
+////        Page categories = categoryService.getAllCategories(pagination);
+////
+////        if (categories.isEmpty()) {
+////            return ResponseBuilder.respond(StatusCode.NOT_FOUND, "Record not found!");
+////        }
+//
+//        return ResponseBuilder.respond(
+//                StatusCode.SUCCESS,
+//                categoryService.getAllCategories(pagination)
+//        );
+//        //return ResponseBuilder.respond(StatusCode.SUCCESS, categories);
+//    }
+
     @GetMapping
-    @Operation(summary = "Get all categories", description = "Get all categories")
-    public ApiResponse<List<CategoryResponse>> getAllCategories() {
-        List<CategoryResponse> categories = categoryService.getAllCategories();
+    @Operation(summary = "Get all categories", description = "Retrieve paginated categories")
+    @Parameters({
+            @Parameter(name = "offset", description = "Records to skip", example = "0"),
+            @Parameter(name = "max", description = "Max records to return", example = "10"),
+            @Parameter(name = "sort", description = "Field to sort by", example = "id"),
+            @Parameter(name = "order", description = "Order to sort by", example = "asc")
+    })
+    public RespondDTO getAllCategories(PaginationRequest pagination) {
+
+        List<CategoryResponse> categories = categoryService.getAllCategories(pagination);
 
         if (categories.isEmpty()) {
-            return ResponseBuilder.respond(StatusCode.NOT_FOUND, "Record not found!");
+            return JSONRespond.respond(null, StatusCode.NOT_FOUND, "Record not found!");
         }
 
-        return ResponseBuilder.respond(StatusCode.SUCCESS, categories);
+        return JSONRespond.respond(categories, StatusCode.SUCCESS, "Get data successfully!");
     }
 
     @GetMapping("/{id}")

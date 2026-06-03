@@ -8,7 +8,7 @@ public class ResponseBuilder {
 
     public static <T> ApiResponse<T> respond(StatusCode statusCode, T data) {
         return ApiResponse.<T>builder()
-                .code(statusCode.getCode())
+//                .code(statusCode.getCode())
                 .message(statusCode.getMessage())
                 .success(true)
                 .data(data)
@@ -18,7 +18,7 @@ public class ResponseBuilder {
 
     public static <T> ApiResponse<T> respond(StatusCode statusCode, String message) {
         return ApiResponse.<T>builder()
-                .code(statusCode.getCode())
+//                .code(statusCode.getCode())
                 .message(message)
                 .success(false)
                 .data(null)
@@ -28,7 +28,7 @@ public class ResponseBuilder {
 
     public static ApiResponse<Void> respond(StatusCode statusCode) {
         return ApiResponse.<Void>builder()
-                .code(statusCode.getCode())
+//                .code(statusCode.getCode())
                 .message(statusCode.getMessage())
                 .success(true)
                 .data(null)
@@ -38,7 +38,7 @@ public class ResponseBuilder {
 
     public static ApiResponse<Void> error(StatusCode statusCode) {
         return ApiResponse.<Void>builder()
-                .code(statusCode.getCode())
+//                .code(statusCode.getCode())
                 .message(statusCode.getMessage())
                 .success(false)
                 .data(null)
@@ -48,7 +48,7 @@ public class ResponseBuilder {
 
     public static ApiResponse<Void> error(StatusCode statusCode, String message) {
         return ApiResponse.<Void>builder()
-                .code(statusCode.getCode())
+//                .code(statusCode.getCode())
                 .message(statusCode.getMessage())
                 .success(false)
                 .data(null)

@@ -1,8 +1,12 @@
 package rmsbackend.service.menus;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.generic.StatusCode;
+import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.menus.Category;
 import rmsbackend.dto.menus.category.CategoryRequest;
 import rmsbackend.dto.menus.category.CategoryResponse;
@@ -67,10 +71,20 @@ public class CategoryService {
         return mapToResponse(category);
     }
 
-    public List<CategoryResponse> getAllCategories() {
-        return categoryRepository.findAll()
-                .stream()
+//    public List<CategoryResponse> getAllCategories(PaginationRequest pagination) {
+//        return categoryRepository.findAll()
+//                .stream()
+//                .map(this::mapToResponse)
+//                .toList();
+//    }
+
+    public List<CategoryResponse> getAllCategories(PaginationRequest pagination) {
+        Pageable pageable = PaginationUtils.pageable(pagination);
+
+        return categoryRepository
+                .findAll(pageable)
                 .map(this::mapToResponse)
+                .stream()
                 .toList();
     }
 
