@@ -81,6 +81,10 @@ public class CategoryService {
     }
 
     public void deleteCategory(String id) {
-        categoryRepository.deleteById(id);
+        Category category = categoryRepository
+                .findById(id).orElseThrow(() ->
+                        new RuntimeException("Category not found."));
+
+        categoryRepository.delete(category);
     }
 }

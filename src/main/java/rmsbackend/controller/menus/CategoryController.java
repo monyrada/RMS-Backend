@@ -17,8 +17,6 @@ import rmsbackend.dto.menus.category.CategoryRequest;
 import rmsbackend.dto.menus.category.CategoryResponse;
 import rmsbackend.service.menus.CategoryService;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
@@ -29,21 +27,21 @@ public class CategoryController {
 
     @PostMapping
     @Operation(summary = "Create a new category", description = "Create a category")
-    public ApiResponse<CategoryResponse> createCategory(@RequestBody CategoryRequest request) {
+    public RespondDTO createCategory(@RequestBody CategoryRequest request) {
         CategoryResponse category = categoryService.createCategory(request);
 
-        return ResponseBuilder.respond(StatusCode.CREATED, category);
+        return JSONRespond.respond(category, StatusCode.CREATED);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update category by ID", description = "Return category list data.")
-    public ApiResponse<CategoryResponse> updateCategory(
+    public RespondDTO updateCategory(
             @PathVariable String id,
-            @RequestBody CategoryRequest request)
-    {
+            @RequestBody CategoryRequest request
+    ) {
         CategoryResponse category = categoryService.updateCategory(id, request);
 
-        return ResponseBuilder.respond(StatusCode.UPDATED, category);
+        return JSONRespond.respond(category, StatusCode.UPDATED);
     }
 
     @GetMapping
@@ -66,18 +64,18 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get category by ID", description = "Get category by ID")
-    public ApiResponse<CategoryResponse> getCategoryById(@PathVariable String id) {
+    public RespondDTO getCategoryById(@PathVariable String id) {
         CategoryResponse response = categoryService.getCategoryById(id);
 
-        return ResponseBuilder.respond(StatusCode.SUCCESS, response);
+        return JSONRespond.respond(response, StatusCode.SUCCESS);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete category by ID", description = "Delete category by ID")
-    public ApiResponse<Void> deleteCategoryById(@PathVariable String id) {
+    public RespondDTO deleteCategoryById(@PathVariable String id) {
         categoryService.deleteCategory(id);
 
-        return ResponseBuilder.respond(StatusCode.DELETED);
+        return JSONRespond.respond(null, StatusCode.DELETED, "Category deleted successfully.");
     }
 
 }
