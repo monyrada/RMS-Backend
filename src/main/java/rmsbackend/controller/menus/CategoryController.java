@@ -54,7 +54,7 @@ public class CategoryController {
             @Parameter(name = "sort", description = "Field to sort by", example = "id"),
             @Parameter(name = "order", description = "Order to sort by", example = "asc")
     })
-    public RespondDTO getAllCategories(PaginationRequest pagination) {
+    public RespondDTO getAllCategories(@Parameter(hidden = true) PaginationRequest pagination) {
         Page<CategoryResponse> categories = categoryService.getAllCategories(pagination);
 
         if (categories.isEmpty()) {
