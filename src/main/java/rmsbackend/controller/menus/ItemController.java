@@ -59,6 +59,14 @@ public class ItemController {
         return JSONRespond.respond(itemResponse, StatusCode.SUCCESS);
     }
 
+    @PutMapping("/{id}")
+    @Operation(summary = "Update item by ID", description = "Return item list data.")
+    public RespondDTO updateItem(@PathVariable String id, @RequestBody ItemRequest request) {
+        ItemResponse item = itemService.updateItemById(id, request);
+
+        return JSONRespond.respond(item, StatusCode.UPDATED);
+    }
+
     @GetMapping("/category/{categoryId}")
     @Operation(summary = "Get all items by categoryId", description = "Return a item listing data.")
     public RespondDTO getAllItemsByCategoryId(@PathVariable String categoryId) {

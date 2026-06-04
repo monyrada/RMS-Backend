@@ -60,6 +60,24 @@ public class ItemService {
         return mapToResponse(item);
     }
 
+    public ItemResponse updateItemById(String id, ItemRequest request) {
+        Item item = itemRepository
+                .findById(id)
+                .orElseThrow();
+
+        Category category = categoryRepository
+                .findById(request.getCategoryId())
+                .orElseThrow();
+
+        item.setCategoryId(category.getId());
+        item.setName(request.getName());
+        item.setNameKh(request.getNameKh());
+        item.setPrice(request.getPrice());
+        item.setDescription(request.getDescription());
+
+        return mapToResponse(itemRepository.save(item));
+    }
+
     public Page<ItemResponse> getAllItems(PaginationRequest pagination) {
         Pageable pageable = PaginationUtils.pageable(pagination);
 
