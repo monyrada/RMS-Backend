@@ -1,7 +1,11 @@
 package rmsbackend.service.menus;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import rmsbackend.common.generic.PaginationRequest;
+import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.menus.Category;
 import rmsbackend.domain.menus.Item;
 import rmsbackend.dto.menus.item.ItemRequest;
@@ -56,11 +60,11 @@ public class ItemService {
         return mapToResponse(item);
     }
 
-    public List<ItemResponse> getAllItems() {
-        return itemRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+    public Page<ItemResponse> getAllItems(PaginationRequest pagination) {
+        Pageable pageable = PaginationUtils.pageable(pagination);
+
+        return itemRepository.findAll(pageable)
+                .map(this::mapToResponse);
     }
 
     public void deleteItemById(String id) {
