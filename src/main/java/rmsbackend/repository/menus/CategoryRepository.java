@@ -5,4 +5,5 @@ import rmsbackend.domain.menus.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, String> {
 
+    boolean existsByName(String name);
 }

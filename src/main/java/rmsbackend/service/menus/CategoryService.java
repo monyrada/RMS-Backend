@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import rmsbackend.common.exception.DuplicateResourceException;
 import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.menus.Category;
@@ -12,7 +13,6 @@ import rmsbackend.dto.menus.category.CategoryResponse;
 import rmsbackend.repository.menus.CategoryRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +22,11 @@ public class CategoryService {
     final private CategoryRepository categoryRepository;
 
     public CategoryResponse createCategory(CategoryRequest request) {
+
+        if (categoryRepository.existsByName(request.getName())) {
+            throw new DuplicateResourceException("Category name already exists");
+        }
+
         Category category = Category.builder()
                 .name(request.getName())
                 .nameKh(request.getNameKh())
