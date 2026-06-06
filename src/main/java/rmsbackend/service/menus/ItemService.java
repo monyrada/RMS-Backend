@@ -1,9 +1,12 @@
 package rmsbackend.service.menus;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import rmsbackend.common.exception.DuplicateResourceException;
+import rmsbackend.common.exception.ResourceNotFoundException;
 import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.menus.Category;
@@ -16,6 +19,7 @@ import rmsbackend.repository.menus.ItemRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ItemService {
@@ -25,10 +29,15 @@ public class ItemService {
 
     public ItemResponse create(ItemRequest request) {
 
+        // check name should be unique
+        if (itemRepository.existsByName(request.getName())) {
+            throw new DuplicateResourceException("Item name already exists");
+        }
+
         // find category data by categoryId
         Category category = categoryRepository
-                .findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found with id:" + request.getCategoryId()));
+                .findById(request.getCategoryId()).orElseThrow(() ->
+                        new ResourceNotFoundException("Category not found with id:" + request.getCategoryId()));
 
         Item item = Item.builder()
                 .categoryId(category.getId())
@@ -40,34 +49,43 @@ public class ItemService {
                 .build();
 
         itemRepository.save(item);
+        log.info("Item id {} has been created on date {}", item.getId(), item.getCreatedAt());
 
         return mapToResponse(item);
     }
 
     public List<ItemResponse> getAllItemsByCategoryId(String categoryId) {
+        log.info("Fetching items by category id {}", categoryId);
 
-        return itemRepository.findByCategoryId(categoryId)
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryId));
+
+        List<ItemResponse> items = itemRepository.findByCategoryId(categoryId)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+
+        log.info( "Retrieved {} items for category: {}", items.size(), category.getName());
+        return items;
     }
 
     public ItemResponse getItemById(String id) {
         Item item = itemRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Item not found with id:" + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Item not found with id :" + id));
 
+        log.info( "Retrieved item by id: {}", item.getId());
         return mapToResponse(item);
     }
 
     public ItemResponse updateItemById(String id, ItemRequest request) {
         Item item = itemRepository
                 .findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Item not found with id :" + id));
 
         Category category = categoryRepository
                 .findById(request.getCategoryId())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id:" + request.getCategoryId()));
 
         item.setCategoryId(category.getId());
         item.setName(request.getName());
@@ -75,18 +93,29 @@ public class ItemService {
         item.setPrice(request.getPrice());
         item.setDescription(request.getDescription());
 
-        return mapToResponse(itemRepository.save(item));
+        var itemData = itemRepository.save(item);
+        log.info( "Retrieved items for category: {}", item.getName());
+
+        return mapToResponse(itemData);
     }
 
     public Page<ItemResponse> getAllItems(PaginationRequest pagination) {
+        log.info("Fetching items include pagination on date {}", LocalDateTime.now());
+
         Pageable pageable = PaginationUtils.pageable(pagination);
 
-        return itemRepository.findAll(pageable)
-                .map(this::mapToResponse);
+        var results = itemRepository.findAll(pageable).map(this::mapToResponse);
+        log.info("Retrieved items include pagination on date {}", LocalDateTime.now());
+
+        return results;
     }
 
     public void deleteItemById(String id) {
+        Item item = itemRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Item not found with id:" + id));
+
         itemRepository.deleteById(id);
+        log.info("Item name {} has been deleted!", item.getName());
     }
 
     private ItemResponse mapToResponse(Item item) {
