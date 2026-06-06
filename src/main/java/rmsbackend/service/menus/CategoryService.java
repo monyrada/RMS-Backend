@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import rmsbackend.common.exception.DuplicateResourceException;
+import rmsbackend.common.exception.ResourceNotFoundException;
 import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.menus.Category;
@@ -37,6 +38,7 @@ public class CategoryService {
                 .build();
 
         categoryRepository.save(category);
+        log.info("Category id {} has been deleted at created {}", category.getId(), category.getCreatedAt());
 
         return mapToResponse(category);
     }
@@ -55,7 +57,8 @@ public class CategoryService {
     }
 
     public CategoryResponse updateCategory(String id, CategoryRequest request) {
-        Category category = categoryRepository.findById(id).orElseThrow();
+        Category category = categoryRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Category not found."));
 
         category.setName(request.getName());
         category.setNameKh(request.getNameKh());
@@ -64,6 +67,7 @@ public class CategoryService {
         category.setDescription(request.getDescription());
 
         categoryRepository.save(category);
+        log.info("Category id {} has been updated!", category.getId());
 
         return mapToResponse(category);
     }
@@ -71,8 +75,9 @@ public class CategoryService {
     public CategoryResponse getCategoryById(String id) {
         Category category = categoryRepository
                 .findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found."));
 
+        log.info("Get category by id {} successfully.", category.getId());
         return mapToResponse(category);
     }
 
@@ -81,15 +86,15 @@ public class CategoryService {
 
         var results = categoryRepository.findAll(pageable).map(this::mapToResponse);
 
-        log.info("Query categories completed!");
+        log.info("Query categories completed on date {}", LocalDateTime.now());
         return results;
     }
 
     public void deleteCategory(String id) {
         Category category = categoryRepository
-                .findById(id).orElseThrow(() ->
-                        new RuntimeException("Category not found."));
+                .findById(id).orElseThrow(() -> new ResourceNotFoundException("Category not found."));
 
         categoryRepository.delete(category);
+        log.info("Category name {} has been deleted!", category.getName());
     }
 }
