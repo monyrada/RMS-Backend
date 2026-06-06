@@ -9,4 +9,6 @@ public interface ItemDetailRepository extends JpaRepository<ItemDetails, String>
 
     List<ItemDetails> findByItemId(String itemId);
 
+    boolean existsByItemIdAndIngredientId(String itemId, String ingredientId);
+
 }
