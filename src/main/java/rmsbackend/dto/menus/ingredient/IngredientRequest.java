@@ -7,7 +7,9 @@ import rmsbackend.enums.StockStatus;
 public class IngredientRequest {
 
     private String name;
+    private String nameKh;
     private String unit;
+    private String description;
     private StockStatus stockStatus;
 
 }

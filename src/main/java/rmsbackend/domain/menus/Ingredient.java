@@ -21,7 +21,9 @@ public class Ingredient {
 
     @Column(nullable = false, unique = true)
     private String name;
+    private String nameKh;
     private String unit;
+    private String description;
 
     @Enumerated(EnumType.STRING)
     private StockStatus stockStatus;
