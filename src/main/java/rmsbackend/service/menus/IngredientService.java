@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import rmsbackend.common.exception.DuplicateResourceException;
+import rmsbackend.common.exception.ResourceNotFoundException;
 import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.menus.Ingredient;
@@ -46,6 +47,15 @@ public class IngredientService {
         return mapToResponse(ingredient);
     }
 
+    public IngredientResponse getIngredientById(String id) {
+        log.info("Getting ingredient by id: {}", id);
+
+        return ingredientRepository.findById(id)
+                .map(this::mapToResponse)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Ingredient not found with id: " + id));
+    }
+
 
     public Page<IngredientResponse> getAllIngredient(PaginationRequest pagination) {
         log.info("Fetching all ingredients for pagination: {}", pagination);
@@ -58,7 +68,32 @@ public class IngredientService {
         return results;
     }
 
+    public IngredientResponse updateIngredient(String id, IngredientRequest request) {
+        log.info("Updating ingredient: {}", id);
 
+        Ingredient ingredient = ingredientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ingredient not found with id: " + id));
+
+        ingredient.setName(request.getName());
+        ingredient.setNameKh(request.getNameKh());
+        ingredient.setUnit(request.getUnit());
+        ingredient.setDescription(request.getDescription());
+        ingredient.setStockStatus(request.getStockStatus());
+
+        ingredient = ingredientRepository.save(ingredient);
+
+        return mapToResponse(ingredient);
+    }
+
+    public void deleteIngredient(String id) {
+        log.info("Deleting ingredient: {}", id);
+
+        Ingredient ingredient = ingredientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ingredient not found with id: " + id));
+
+        ingredientRepository.delete(ingredient);
+        log.info("Ingredient deleted successfully: {}", id);
+    }
 
     // map response
     public IngredientResponse mapToResponse(Ingredient ingredient) {

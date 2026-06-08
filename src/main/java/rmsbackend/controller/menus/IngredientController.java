@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +49,30 @@ public class IngredientController {
 
         return JSONRespond.respond(ingredientList, StatusCode.SUCCESS, "Ingredient list returned successfully.");
 
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get Ingredient By ID", description = "Return ingredient data")
+    public RespondDTO getById(@PathVariable String id) {
+        IngredientResponse ingredient = ingredientService.getIngredientById(id);
+
+        return JSONRespond.respond(ingredient, StatusCode.SUCCESS, "Ingredient retrieved successfully.");
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete Ingredient")
+    public RespondDTO delete(@PathVariable String id) {
+        ingredientService.deleteIngredient(id);
+
+        return JSONRespond.respond(null, StatusCode.SUCCESS, "Ingredient deleted successfully.");
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update Ingredient")
+    public RespondDTO update(@PathVariable String id, @Valid @RequestBody IngredientRequest request) {
+        IngredientResponse ingredient = ingredientService.updateIngredient(id, request);
+
+        return JSONRespond.respond(ingredient, StatusCode.SUCCESS, "Ingredient updated successfully.");
     }
 
 
