@@ -22,11 +22,11 @@ public class ItemDetailsController {
     private final ItemDetailsService itemDetailsService;
 
     @PostMapping
-    @Operation(summary = "Create a new item-details", description = "Create a item-details" )
+    @Operation(summary = "Create a new item-details", description = "Return a item-details" )
     public RespondDTO create(@RequestBody ItemDetailRequest request) {
         var itemDetails = itemDetailsService.createItemDetail(request);
 
-        return JSONRespond.respond(itemDetails, StatusCode.CREATED, "Item Details created successfully.");
+        return JSONRespond.respond(itemDetails, StatusCode.CREATED, "Item-Details created successfully.");
     }
 
 
