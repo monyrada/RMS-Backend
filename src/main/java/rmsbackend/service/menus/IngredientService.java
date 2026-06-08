@@ -2,12 +2,18 @@ package rmsbackend.service.menus;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import rmsbackend.common.exception.DuplicateResourceException;
+import rmsbackend.common.generic.PaginationRequest;
+import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.menus.Ingredient;
 import rmsbackend.dto.menus.ingredient.IngredientRequest;
 import rmsbackend.dto.menus.ingredient.IngredientResponse;
 import rmsbackend.repository.menus.IngredientRepository;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -38,6 +44,18 @@ public class IngredientService {
         log.info("Ingredient created successfully: {}", ingredient.getId());
 
         return mapToResponse(ingredient);
+    }
+
+
+    public Page<IngredientResponse> getAllIngredient(PaginationRequest pagination) {
+        log.info("Fetching all ingredients for pagination: {}", pagination);
+
+        Pageable pageable = PaginationUtils.pageable(pagination);
+
+        var results = ingredientRepository.findAll(pageable).map(this::mapToResponse);
+        log.info("Retrieved ingredients include pagination on date {}", LocalDateTime.now());
+
+        return results;
     }
 
 
