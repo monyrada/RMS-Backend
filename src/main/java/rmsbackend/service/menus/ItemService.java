@@ -18,6 +18,9 @@ import rmsbackend.repository.menus.ItemRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -103,11 +106,17 @@ public class ItemService {
         log.info("Fetching items include pagination on date {}", LocalDateTime.now());
 
         Pageable pageable = PaginationUtils.pageable(pagination);
+        Page<Item> items = itemRepository.findAll(pageable);
 
-        var results = itemRepository.findAll(pageable).map(this::mapToResponse);
-        log.info("Retrieved items include pagination on date {}", LocalDateTime.now());
+        Set<String> categoryIds = items.stream()
+                .map(Item::getCategoryId)
+                .collect(Collectors.toSet());
 
-        return results;
+        Map<String, Category> categoryMap = categoryRepository.findAllById(categoryIds)
+                .stream()
+                .collect(Collectors.toMap(Category::getId, c -> c));
+
+        return items.map(item -> mapItemData(item, categoryMap));
     }
 
     public void deleteItemById(String id) {
@@ -118,16 +127,36 @@ public class ItemService {
         log.info("Item name {} has been deleted!", item.getName());
     }
 
-    private ItemResponse mapToResponse(Item item) {
+    private ItemResponse mapItemData(Item item, Map<String, Category> categoryMap) {
+        Category category = categoryMap.get(item.getCategoryId());
+
         return ItemResponse.builder()
                 .id(item.getId())
-                .categoryId(item.getCategoryId())
+                //.categoryId(item.getCategoryId())
+                .categoryName(category != null ? category.getName() : null)
                 .name(item.getName())
                 .nameKh(item.getNameKh())
                 .price(item.getPrice())
                 .imageUrl(item.getImageUrl())
                 .status(item.getStatus())
                 .description(item.getDescription())
+                .createdAt(item.getCreatedAt())
+                .updatedAt(item.getUpdatedAt())
+                .build();
+    }
+
+    private ItemResponse mapToResponse(Item item) {
+        return ItemResponse.builder()
+                .id(item.getId())
+                //.categoryId(item.getCategoryId())
+                .name(item.getName())
+                .nameKh(item.getNameKh())
+                .price(item.getPrice())
+                .imageUrl(item.getImageUrl())
+                .status(item.getStatus())
+                .description(item.getDescription())
+                .createdAt(item.getCreatedAt())
+                .updatedAt(item.getUpdatedAt())
                 .build();
     }
 
