@@ -11,6 +11,7 @@ import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.generic.StatusCode;
 import rmsbackend.common.util.JSONRespond;
 import rmsbackend.dto.RespondDTO;
+import rmsbackend.dto.menus.item.ItemFilterRequest;
 import rmsbackend.dto.menus.item.ItemRequest;
 import rmsbackend.dto.menus.item.ItemResponse;
 import rmsbackend.service.menus.ItemService;
@@ -36,13 +37,22 @@ public class ItemController {
     @GetMapping
     @Operation(summary = "Get all items", description = "Return item data as list")
     @Parameters({
-            @Parameter(name = "offset", description = "Records to skip", example = "0"),
-            @Parameter(name = "max", description = "Max records to return", example = "10"),
-            @Parameter(name = "sort", description = "Field to sort by", example = "id"),
-            @Parameter(name = "order", description = "Order to sort by", example = "asc")
+            @Parameter(name = "offset",     description = "Records to skip", example = "0"),
+            @Parameter(name = "max",        description = "Max records to return", example = "10"),
+            @Parameter(name = "sort",       description = "Field to sort by", example = "id"),
+            @Parameter(name = "order",      description = "Order to sort by", example = "asc"),
+            @Parameter(name = "categoryId", description = "Filter by category UUID", example = "abc-123"),
+            @Parameter(name = "keyword",    description = "Search name/nameKh/desc", example = "burger"),
+            @Parameter(name = "status",     description = "true=active, false=inactive"),
+            @Parameter(name = "minPrice",   description = "Minimum price", example = "1.00"),
+            @Parameter(name = "maxPrice",   description = "Maximum price", example = "50.00")
     })
-    public RespondDTO getAllItems(@Parameter(hidden = true)PaginationRequest pagination) {
-        Page<ItemResponse> itemsList = itemService.getAllItems(pagination);
+    public RespondDTO getAllItems(
+            @Parameter(hidden = true)PaginationRequest pagination,
+            @Parameter(hidden = true)ItemFilterRequest filter) {
+        //ItemFilterRequest filter = new ItemFilterRequest();
+
+        Page<ItemResponse> itemsList = itemService.getAllItems(pagination, filter);
 
         if (itemsList.isEmpty()) {
             return JSONRespond.respond(null, StatusCode.NOT_FOUND, "Record not found!");

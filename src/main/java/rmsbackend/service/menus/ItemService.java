@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import rmsbackend.common.exception.DuplicateResourceException;
 import rmsbackend.common.exception.ResourceNotFoundException;
@@ -11,14 +12,17 @@ import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.menus.Category;
 import rmsbackend.domain.menus.Item;
+import rmsbackend.dto.menus.item.ItemFilterRequest;
 import rmsbackend.dto.menus.item.ItemRequest;
 import rmsbackend.dto.menus.item.ItemResponse;
 import rmsbackend.repository.menus.CategoryRepository;
 import rmsbackend.repository.menus.ItemRepository;
+import rmsbackend.specification.ItemSpecification;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -102,14 +106,17 @@ public class ItemService {
         return mapToResponse(itemData);
     }
 
-    public Page<ItemResponse> getAllItems(PaginationRequest pagination) {
+    public Page<ItemResponse> getAllItems(PaginationRequest pagination, ItemFilterRequest filter) {
         log.info("Fetching items include pagination on date {}", LocalDateTime.now());
 
         Pageable pageable = PaginationUtils.pageable(pagination);
-        Page<Item> items = itemRepository.findAll(pageable);
+        Specification<Item> specification = ItemSpecification.withFilter(filter);
+
+        Page<Item> items = itemRepository.findAll(specification, pageable);
 
         Set<String> categoryIds = items.stream()
                 .map(Item::getCategoryId)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         Map<String, Category> categoryMap = categoryRepository.findAllById(categoryIds)
