@@ -98,6 +98,7 @@ public class ItemService {
         item.setName(request.getName());
         item.setNameKh(request.getNameKh());
         item.setPrice(request.getPrice());
+        item.setStatus(request.getStatus());
         item.setDescription(request.getDescription());
 
         var itemData = itemRepository.save(item);

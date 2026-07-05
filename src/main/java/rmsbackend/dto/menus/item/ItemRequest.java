@@ -11,6 +11,7 @@ public class ItemRequest {
     private String name;
     private String nameKh;
     private BigDecimal price;
+    private Boolean status;
     private String description;
 
 }
