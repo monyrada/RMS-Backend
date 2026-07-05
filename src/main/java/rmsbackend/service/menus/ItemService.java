@@ -140,7 +140,7 @@ public class ItemService {
 
         return ItemResponse.builder()
                 .id(item.getId())
-                //.categoryId(item.getCategoryId())
+                .categoryId(item.getCategoryId())
                 .categoryName(category != null ? category.getName() : null)
                 .name(item.getName())
                 .nameKh(item.getNameKh())

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class ItemResponse {
 
     private String id;
-    //private String categoryId;
+    private String categoryId;
     private String categoryName;
     private String name;
     private String nameKh;
