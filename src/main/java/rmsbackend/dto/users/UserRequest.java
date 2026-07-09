@@ -25,6 +25,4 @@ public class UserRequest {
     private LocalDate dateOfBirth;
     private UserStatus status;
     private Boolean enabled;
-
-    private LocalDateTime lastLoginAt;
 }
