@@ -3,7 +3,12 @@ package rmsbackend.service.users;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import rmsbackend.common.exception.ResourceNotFoundException;
+import rmsbackend.common.generic.PaginationRequest;
+import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.users.User;
 import rmsbackend.dto.users.UserRequest;
 import rmsbackend.dto.users.UserResponse;
@@ -38,4 +43,54 @@ public class UserService {
 
         return userMapper.toResponse(user);
     }
+
+    public UserResponse update(String id, UserRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+
+        user.setUsername(request.getUsername());
+        user.setFirstName(request.getFirstname());
+        user.setLastName(request.getLastname());
+        user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setProfileImage(request.getProfileImage());
+        user.setGender(request.getGender());
+        user.setDateOfBirth(request.getDateOfBirth());
+        user.setEnabled(request.getEnabled());
+        user.setStatus(request.getStatus());
+
+        userRepository.save(user);
+        log.info("User id {} has been updated", user.getId());
+
+        return userMapper.toResponse(user);
+    }
+
+    public Page<UserResponse> getAllUsers(PaginationRequest pagination) {
+        log.info("====== Fetching users include pagination =====");
+
+        Pageable pageable = PaginationUtils.pageable(pagination);
+        Page<User> users = userRepository.findAll(pageable);
+
+        return users.map(userMapper::toResponse);
+    }
+
+    public UserResponse getUserById(String id) {
+        var user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
+
+        log.info( "Retrieved user by id: {}", user.getId());
+        return userMapper.toResponse(user);
+    }
+
+    public boolean delete(String id) {
+        if (!userRepository.existsById(id)) {
+            return false;
+        }
+
+        userRepository.deleteById(id);
+        log.info("User id {} has been deleted", id);
+
+        return true;
+    }
+
 }
