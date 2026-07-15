@@ -13,6 +13,7 @@ import rmsbackend.common.generic.StatusCode;
 import rmsbackend.common.util.JSONRespond;
 import rmsbackend.dto.RespondDTO;
 import rmsbackend.dto.users.ChangePasswordRequest;
+import rmsbackend.dto.users.ForgetPasswordRequest;
 import rmsbackend.dto.users.UserRequest;
 import rmsbackend.dto.users.UserResponse;
 import rmsbackend.service.users.UserService;
@@ -101,5 +102,19 @@ public class UserController {
             return JSONRespond.respond(null, StatusCode.BAD_REQUEST, e.getMessage());
         }
     }
+
+    @PostMapping("/forget-password")
+    @Operation(summary = "Forget password", description = "Generate a password reset token for the given email")
+    public RespondDTO forgetPassword(@Valid @RequestBody ForgetPasswordRequest request) {
+        String token = userService.forgetPassword(request);
+
+        if (token == null) {
+            return JSONRespond.respond(null, StatusCode.NOT_FOUND, "No account found with that email.");
+        }
+
+        return JSONRespond.respond(token, StatusCode.SUCCESS, "Reset token generated.");
+    }
+
+
 
 }

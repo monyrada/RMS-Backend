@@ -3,6 +3,7 @@ package rmsbackend.service.users;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,13 +11,18 @@ import org.springframework.stereotype.Service;
 import rmsbackend.common.exception.ResourceNotFoundException;
 import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.util.PaginationUtils;
+import rmsbackend.domain.users.PasswordResetToken;
 import rmsbackend.domain.users.User;
 import rmsbackend.dto.users.ChangePasswordRequest;
+import rmsbackend.dto.users.ForgetPasswordRequest;
 import rmsbackend.dto.users.UserRequest;
 import rmsbackend.dto.users.UserResponse;
 import rmsbackend.mapper.UserMapper;
 import rmsbackend.repository.users.PasswordResetTokenRepository;
 import rmsbackend.repository.users.UserRepository;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Transactional
 @Slf4j
@@ -28,6 +34,9 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetTokenRepository resetTokenRepository;
+
+    @Value("${app.password-reset.expiry-minutes:15}")
+    private long resetTokenExpiryMinutes;
 
     public UserResponse create(UserRequest request) {
         User user = User.builder()
@@ -117,5 +126,31 @@ public class UserService {
 
         return true;
     }
+
+    /**
+     * NOTE: returning the raw token to the caller is a TEMPORARY stand-in until
+     * an email service exists. Replace with "send token via email" before this
+     * goes anywhere near production.
+     */
+    public String forgetPassword(ForgetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User with email " + request.getEmail() + " not found."));
+
+        String token = UUID.randomUUID().toString();
+
+        PasswordResetToken resetToken = PasswordResetToken.builder()
+                .token(token)
+                .user(user)
+                .expiryDate(LocalDateTime.now().plusMinutes(resetTokenExpiryMinutes))
+                .used(false)
+                .build();
+
+        resetTokenRepository.save(resetToken);
+        log.info("Password reset token generated for user id {}", user.getId());
+
+        return token;
+    }
+
+
 
 }
