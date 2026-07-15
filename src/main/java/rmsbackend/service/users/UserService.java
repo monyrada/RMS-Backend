@@ -38,8 +38,8 @@ public class UserService {
     public UserResponse create(UserRequest request) {
         User user = User.builder()
                 .username(request.getUsername())
-                .firstName(request.getFirstname())
-                .lastName(request.getLastname())
+                .firstname(request.getFirstname())
+                .lastname(request.getLastname())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -61,8 +61,8 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
 
         user.setUsername(request.getUsername());
-        user.setFirstName(request.getFirstname());
-        user.setLastName(request.getLastname());
+        user.setFirstname(request.getFirstname());
+        user.setLastname(request.getLastname());
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
         user.setProfileImage(request.getProfileImage());
