@@ -12,10 +12,7 @@ import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.generic.StatusCode;
 import rmsbackend.common.util.JSONRespond;
 import rmsbackend.dto.RespondDTO;
-import rmsbackend.dto.users.ChangePasswordRequest;
-import rmsbackend.dto.users.ForgetPasswordRequest;
-import rmsbackend.dto.users.UserRequest;
-import rmsbackend.dto.users.UserResponse;
+import rmsbackend.dto.users.*;
 import rmsbackend.service.users.UserService;
 
 @RestController
@@ -115,6 +112,17 @@ public class UserController {
         return JSONRespond.respond(token, StatusCode.SUCCESS, "Reset token generated.");
     }
 
+    @PostMapping("/reset-password")
+    @Operation(summary = "Reset password", description = "Reset password using a valid reset token")
+    public RespondDTO resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        boolean success = userService.resetPassword(request);
+
+        if (!success) {
+            return JSONRespond.respond(null, StatusCode.BAD_REQUEST, "Invalid or expired token.");
+        }
+
+        return JSONRespond.respond(null, StatusCode.SUCCESS, "Password reset successfully!");
+    }
 
 
 }

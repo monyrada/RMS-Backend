@@ -13,10 +13,7 @@ import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.users.PasswordResetToken;
 import rmsbackend.domain.users.User;
-import rmsbackend.dto.users.ChangePasswordRequest;
-import rmsbackend.dto.users.ForgetPasswordRequest;
-import rmsbackend.dto.users.UserRequest;
-import rmsbackend.dto.users.UserResponse;
+import rmsbackend.dto.users.*;
 import rmsbackend.mapper.UserMapper;
 import rmsbackend.repository.users.PasswordResetTokenRepository;
 import rmsbackend.repository.users.UserRepository;
@@ -151,6 +148,24 @@ public class UserService {
         return token;
     }
 
+    public boolean resetPassword(ResetPasswordRequest request) {
+        PasswordResetToken resetToken = resetTokenRepository.findByToken(request.getToken()).orElse(null);
+
+        if (resetToken == null || resetToken.isUsed() || resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            return false;
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        resetToken.setUsed(true);
+        resetTokenRepository.save(resetToken);
+
+        log.info("Password reset completed for user id {}", user.getId());
+
+        return true;
+    }
 
 
 }
