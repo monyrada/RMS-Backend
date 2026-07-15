@@ -5,14 +5,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rmsbackend.common.exception.ResourceNotFoundException;
 import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.users.User;
+import rmsbackend.dto.users.ChangePasswordRequest;
 import rmsbackend.dto.users.UserRequest;
 import rmsbackend.dto.users.UserResponse;
 import rmsbackend.mapper.UserMapper;
+import rmsbackend.repository.users.PasswordResetTokenRepository;
 import rmsbackend.repository.users.UserRepository;
 
 @Transactional
@@ -23,6 +26,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final PasswordResetTokenRepository resetTokenRepository;
 
     public UserResponse create(UserRequest request) {
         User user = User.builder()
@@ -31,6 +36,7 @@ public class UserService {
                 .lastName(request.getLastname())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .profileImage(request.getProfileImage())
                 .gender(request.getGender())
                 .dateOfBirth(request.getDateOfBirth())
@@ -89,6 +95,25 @@ public class UserService {
 
         userRepository.deleteById(id);
         log.info("User id {} has been deleted", id);
+
+        return true;
+    }
+
+    /**
+     * TODO: userId should come from the authenticated principal (SecurityContextHolder),
+     * not a caller-supplied path variable, once the JWT auth layer exposes it here.
+     */
+    public boolean changePassword(String userId, ChangePasswordRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id "+ userId + " not found."));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect.");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        log.info("Password changed for user id {}", userId);
 
         return true;
     }

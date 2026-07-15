@@ -12,6 +12,7 @@ import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.generic.StatusCode;
 import rmsbackend.common.util.JSONRespond;
 import rmsbackend.dto.RespondDTO;
+import rmsbackend.dto.users.ChangePasswordRequest;
 import rmsbackend.dto.users.UserRequest;
 import rmsbackend.dto.users.UserResponse;
 import rmsbackend.service.users.UserService;
@@ -84,6 +85,21 @@ public class UserController {
         }
 
         return JSONRespond.respond(null, StatusCode.SUCCESS, "User deleted successfully!");
+    }
+
+    @PutMapping("/{id}/change-password")
+    @Operation(summary = "Change password", description = "Change password for an authenticated user")
+    public RespondDTO changePassword(@PathVariable String id, @Valid @RequestBody ChangePasswordRequest request) {
+        try {
+            boolean success = userService.changePassword(id, request);
+            if (!success) {
+                return JSONRespond.respond(null, StatusCode.NOT_FOUND, "User not found!");
+            }
+            return JSONRespond.respond(null, StatusCode.SUCCESS, "Password changed successfully!");
+
+        } catch (IllegalArgumentException e) {
+            return JSONRespond.respond(null, StatusCode.BAD_REQUEST, e.getMessage());
+        }
     }
 
 }
