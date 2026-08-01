@@ -21,3 +21,15 @@ spring:
 logging:
   level:
     rmsbackend.common.logging.RequestBodyLoggingFilter: INFO
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:change-this-development-secret-before-production}
+    access-token-expiry-minutes: ${JWT_ACCESS_TOKEN_EXPIRY_MINUTES:15}
+  refresh-token:
+    expiry-minutes: ${REFRESH_TOKEN_EXPIRY_MINUTES:10080}
+  seed:
+    system-user:
+      enabled: ${SYSTEM_USER_SEED_ENABLED:true}
+      email: ${SYSTEM_USER_EMAIL:admin@rms.local}
+      password: ${SYSTEM_USER_PASSWORD:Admin@12345}
