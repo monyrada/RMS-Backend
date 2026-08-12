@@ -33,6 +33,13 @@ public class GlobalExceptionHandler {
         return JSONRespond.error(StatusCode.BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public RespondDTO handleIllegalArgumentException(IllegalArgumentException exception) {
+        log.warn(exception.getMessage());
+
+        return JSONRespond.error(StatusCode.BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public RespondDTO handleValidationException(MethodArgumentNotValidException exception) {
         String errorMessage = exception.getBindingResult()
@@ -45,6 +52,7 @@ public class GlobalExceptionHandler {
         return JSONRespond.error(StatusCode.BAD_REQUEST, errorMessage);
     }
 
+    @ExceptionHandler(Exception.class)
     public RespondDTO handleException(Exception exception) {
         log.error("Unexpected error", exception);
 
