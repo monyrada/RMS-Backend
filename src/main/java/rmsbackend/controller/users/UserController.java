@@ -7,12 +7,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import rmsbackend.common.exception.ResourceNotFoundException;
 import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.generic.StatusCode;
 import rmsbackend.common.util.JSONRespond;
 import rmsbackend.dto.RespondDTO;
 import rmsbackend.dto.users.*;
+import rmsbackend.security.UserPrincipal;
 import rmsbackend.service.users.UserService;
 
 @RestController
@@ -85,6 +88,18 @@ public class UserController {
         return JSONRespond.respond(null, StatusCode.SUCCESS, "User deleted successfully!");
     }
 
+    @GetMapping("/me")
+    @Operation(summary = "Get current user", description = "Get profile of the authenticated user")
+    public RespondDTO getCurrentUser(@AuthenticationPrincipal UserPrincipal principal) {
+        try {
+            UserResponse user = userService.getUserById(principal.getId());
+            return JSONRespond.respond(user, StatusCode.SUCCESS, "User retrieved successfully!");
+
+        } catch (ResourceNotFoundException e) {
+            return JSONRespond.respond(null, StatusCode.NOT_FOUND, e.getMessage());
+        }
+    }
+
     @PutMapping("/{id}/change-password")
     @Operation(summary = "Change password", description = "Change password for an authenticated user")
     public RespondDTO changePassword(@PathVariable String id, @Valid @RequestBody ChangePasswordRequest request) {
@@ -95,6 +110,23 @@ public class UserController {
             }
             return JSONRespond.respond(null, StatusCode.SUCCESS, "Password changed successfully!");
 
+        } catch (IllegalArgumentException e) {
+            return JSONRespond.respond(null, StatusCode.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PutMapping("/me/change-password")
+    @Operation(summary = "Change current user's password",
+            description = "Change password for the authenticated user, resolved from the JWT")
+    public RespondDTO changeCurrentUserPassword(@AuthenticationPrincipal UserPrincipal principal,
+                                                @Valid @RequestBody ChangePasswordRequest request) {
+        try {
+            boolean success = userService.changePassword(principal.getId(), request);
+            if (!success) {
+                return JSONRespond.respond(null, StatusCode.NOT_FOUND, "User not found!");
+            }
+
+            return JSONRespond.respond(null, StatusCode.SUCCESS, "Password changed successfully!");
         } catch (IllegalArgumentException e) {
             return JSONRespond.respond(null, StatusCode.BAD_REQUEST, e.getMessage());
         }
