@@ -11,7 +11,7 @@ import java.util.UUID;
 @Setter
 public class RestaurantTableResponse {
 
-    private UUID id;
+    private String id;
     private String tableNumber;
     private Integer capacity;
     private String location;

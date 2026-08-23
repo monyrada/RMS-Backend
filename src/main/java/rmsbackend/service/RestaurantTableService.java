@@ -11,9 +11,9 @@ public interface RestaurantTableService {
 
     List<RestaurantTableResponse> findAll();
 
-    RestaurantTableResponse findById(UUID id);
+    RestaurantTableResponse findById(String id);
 
-    RestaurantTableResponse update(UUID id, RestaurantTableRequest request);
+    RestaurantTableResponse update(String id, RestaurantTableRequest request);
 
-    void delete(UUID id);
+    void delete(String id);
 }

@@ -61,17 +61,17 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     }
 
     @Override
-    public RestaurantTableResponse findById(UUID id) {
+    public RestaurantTableResponse findById(String id) {
         return null;
     }
 
     @Override
-    public RestaurantTableResponse update(UUID id, RestaurantTableRequest request) {
+    public RestaurantTableResponse update(String id, RestaurantTableRequest request) {
         return null;
     }
 
     @Override
-    public void delete(UUID id) {
+    public void delete(String id) {
 
     }
 }
