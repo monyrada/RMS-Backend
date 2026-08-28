@@ -5,6 +5,6 @@ import rmsbackend.domain.RestaurantTable;
 
 import java.util.UUID;
 
-public interface RestaurantTableRepository extends JpaRepository<RestaurantTable, UUID> {
+public interface RestaurantTableRepository extends JpaRepository<RestaurantTable, String> {
     boolean existsByTableNumber(String tableNumber);
 }
