@@ -14,6 +14,7 @@ import rmsbackend.common.generic.StatusCode;
 import rmsbackend.common.util.JSONRespond;
 import rmsbackend.dto.RespondDTO;
 import rmsbackend.dto.order.OrderFilterRequest;
+import rmsbackend.dto.order.OrderItemRequest;
 import rmsbackend.dto.order.OrderRequest;
 import rmsbackend.dto.order.OrderResponse;
 import rmsbackend.service.orders.OrderService;
@@ -32,6 +33,31 @@ public class OrderController {
         OrderResponse order = orderService.create(request);
 
         return JSONRespond.respond(order, StatusCode.CREATED);
+    }
+
+    @PostMapping("/{orderId}/items")
+    @Operation(summary = "Add an item to an order")
+    public RespondDTO addNewItem(@PathVariable String orderId, @RequestBody OrderItemRequest request) throws BadRequestException {
+        OrderResponse order = orderService.addNewItem(orderId, request);
+
+        return JSONRespond.respond(order, StatusCode.CREATED);
+    }
+
+    @PutMapping("/{orderId}/items/{itemId}")
+    @Operation(summary = "Update an order item", description = "Update quantity, status, or note of a line item")
+    public RespondDTO updateItem(@PathVariable String orderId, @PathVariable String itemId,
+                                 @RequestBody OrderItemRequest request) {
+        OrderResponse order = orderService.updateExistingItem(orderId, itemId, request);
+
+        return JSONRespond.respond(order, StatusCode.UPDATED);
+    }
+
+    @DeleteMapping("/{orderId}/items/{itemId}")
+    @Operation(summary = "Remove an item from an order")
+    public RespondDTO removeItem(@PathVariable String orderId, @PathVariable String itemId) throws BadRequestException {
+        OrderResponse order = orderService.removeItem(orderId, itemId);
+
+        return JSONRespond.respond(order, StatusCode.DELETED);
     }
 
     @GetMapping("/{id}")
