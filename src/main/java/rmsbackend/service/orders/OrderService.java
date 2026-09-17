@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -118,7 +119,7 @@ public class OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id:" + id));
 
-        return orderMapper.toResponse(order);
+        return orderMapper.toResponse(order, orderItemRepository.findByOrderId(order.getId()));
     }
 
     public OrderResponse update(String id, OrderRequest request) throws BadRequestException {
@@ -139,7 +140,7 @@ public class OrderService {
         order = orderRepository.save(order);
         log.info("Order {} updated", order.getOrderNumber());
 
-        return orderMapper.toResponse(order);
+        return orderMapper.toResponse(order, orderItemRepository.findByOrderId(order.getId()));
     }
 
     public OrderResponse addNewItem(String orderId, OrderItemRequest request) throws BadRequestException {
@@ -160,10 +161,10 @@ public class OrderService {
         OrderItem orderItem = orderItemMapper.toEntity(request, order, menu);
         orderItemRepository.save(orderItem);
 
-        recalculateTotals(order);
+        List<OrderItem> items = recalculateTotals(order);
         log.info("Order {} added", order.getOrderNumber());
 
-        return orderMapper.toResponse(orderRepository.save(order));
+        return orderMapper.toResponse(orderRepository.save(order), items);
     }
 
     public OrderResponse updateExistingItem(String orderId, String itemId, OrderItemRequest request) {
@@ -177,10 +178,10 @@ public class OrderService {
         if (request.getNote() != null) item.setNote(request.getNote());
 
         orderItemRepository.save(item);
-        recalculateTotals(order);
+        List<OrderItem> items = recalculateTotals(order);
         log.info("Order item {} updated", order.getOrderNumber());
 
-        return orderMapper.toResponse(orderRepository.save(order));
+        return orderMapper.toResponse(orderRepository.save(order), items);
     }
 
     public OrderResponse removeItem(String orderId, String itemId) throws BadRequestException {
@@ -192,10 +193,10 @@ public class OrderService {
         }
 
         orderItemRepository.deleteById(itemId);
-        recalculateTotals(order);
+        List<OrderItem> items = recalculateTotals(order);
         log.info("Order item {} removed", order.getOrderNumber());
 
-        return orderMapper.toResponse(orderRepository.save(order));
+        return orderMapper.toResponse(orderRepository.save(order), items);
     }
 
     public Page<OrderResponse> getAllOrders(PaginationRequest pagination, OrderFilterRequest filter) {
@@ -203,7 +204,12 @@ public class OrderService {
         Specification<Order> specification = OrderSpecification.withFilter(filter);
 
         Page<Order> orders = orderRepository.findAll(specification, pageable);
-        return orders.map(orderMapper::toResponse);
+
+        List<String> orderIds = orders.getContent().stream().map(Order::getId).toList();
+        Map<String, List<OrderItem>> itemsByOrderId = orderItemRepository.findByOrderIdIn(orderIds).stream()
+                .collect(Collectors.groupingBy(item -> item.getOrder().getId()));
+
+        return orders.map(order -> orderMapper.toResponse(order, itemsByOrderId.getOrDefault(order.getId(), List.of())));
     }
 
     private void validateTransition(OrderStatus from, OrderStatus to) throws BadRequestException {
@@ -212,7 +218,7 @@ public class OrderService {
         }
     }
 
-    private void recalculateTotals(Order order) {
+    private List<OrderItem> recalculateTotals(Order order) {
         List<OrderItem> items = orderItemRepository.findByOrderId(order.getId());
         BigDecimal subTotal = items.stream()
                 .map(OrderItem::getSubtotal)
@@ -220,6 +226,8 @@ public class OrderService {
 
         order.setSubtotal(subTotal);
         order.setTotalAmount(subTotal.subtract(order.getDiscount()).add(order.getTax()));
+
+        return items;
     }
 
     private void freeTableIfNoActiveOrders(String tableId) {
@@ -240,7 +248,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id:" + orderId));
 
-        return orderMapper.toResponse(order);
+        return orderMapper.toResponse(order, orderItemRepository.findByOrderId(order.getId()));
     }
 
     private String generateOrderNumber() {

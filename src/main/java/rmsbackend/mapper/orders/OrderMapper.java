@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import rmsbackend.domain.RestaurantTable;
 import rmsbackend.domain.orders.Order;
+import rmsbackend.domain.orders.OrderItem;
 import rmsbackend.dto.order.OrderRequest;
 import rmsbackend.dto.order.OrderResponse;
+import rmsbackend.enums.orders.OrderStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,15 +23,21 @@ public class OrderMapper {
                 .table(table)
                 .orderType(orderRequest.getOrderType())
                 .source(orderRequest.getSource())
-                .status(orderRequest.getStatus())
+                .status(OrderStatus.PENDING)
                 .guestCount(orderRequest.getGuestCount())
                 .subtotal(BigDecimal.ZERO)
+                .discount(orderRequest.getDiscount())
+                .tax(orderRequest.getTax())
                 .totalAmount(BigDecimal.ZERO)
                 .note(orderRequest.getNote())
                 .build();
     }
 
     public OrderResponse toResponse(Order order) {
+        return toResponse(order, List.of());
+    }
+
+    public OrderResponse toResponse(Order order, List<OrderItem> items) {
         return OrderResponse.builder()
                 .id(order.getId())
                 .orderNumber(order.getOrderNumber())
@@ -44,6 +52,7 @@ public class OrderMapper {
                 .tax(order.getTax())
                 .totalAmount(order.getTotalAmount())
                 .note(order.getNote())
+                .items(orderItemMapper.toResponseList(items))
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .build();

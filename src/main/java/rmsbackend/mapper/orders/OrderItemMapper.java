@@ -38,6 +38,7 @@ public class OrderItemMapper {
                 .quantity(item.getQuantity())
                 .unitPrice(item.getUnitPrice())
                 .subtotal(item.getSubtotal())
+                .status(item.getStatus())
                 .note(item.getNote())
                 .build();
     }
