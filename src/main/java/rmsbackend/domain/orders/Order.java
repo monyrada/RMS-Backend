@@ -45,6 +45,9 @@ public class Order {
     @Column(name = "guest_count")
     private Integer guestCount;
 
+    @Column(name = "guest_name")
+    private String guestName;
+
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotal;
 

@@ -46,7 +46,8 @@ public class SecurityConfig {
                                 "/api/v1/auth/refresh",
                                 "/api/v1/auth/logout",
                                 "/api/v1/items",
-                                "/api/v1/categories"
+                                "/api/v1/categories",
+                                "/api/v1/tables/scan/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users/forget-password").permitAll()

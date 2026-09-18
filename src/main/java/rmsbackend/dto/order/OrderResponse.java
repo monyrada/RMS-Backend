@@ -26,6 +26,7 @@ public class OrderResponse {
 
     private OrderStatus status;
     private Integer guestCount;
+    private String guestName;
 
     private BigDecimal subtotal;
     private BigDecimal discount;

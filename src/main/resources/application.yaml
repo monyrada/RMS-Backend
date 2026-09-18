@@ -33,3 +33,6 @@ app:
       enabled: ${SYSTEM_USER_SEED_ENABLED:true}
       email: ${SYSTEM_USER_EMAIL:admin@rms.local}
       password: ${SYSTEM_USER_PASSWORD:Admin@12345}
+  qr:
+    base-url: ${QR_BASE_URL:http://localhost:3000}
+    image-size: ${QR_IMAGE_SIZE:320}

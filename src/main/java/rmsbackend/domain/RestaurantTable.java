@@ -32,6 +32,9 @@ public class RestaurantTable {
 
     private String qrCodeUrl;
 
+    /** Name shown on the floor plan for whoever currently holds the table (walk-in guest or reservation). */
+    private String currentGuestName;
+
     private Boolean isActive = true;
 
     private LocalDateTime createdAt;

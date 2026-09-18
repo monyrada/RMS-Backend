@@ -23,4 +23,7 @@ public class RestaurantTableRequest {
 
     private TableStatus status;
     private Boolean isActive;
+
+    /** Optional guest name to show on the floor plan, e.g. when marking a table RESERVED. */
+    private String currentGuestName;
 }

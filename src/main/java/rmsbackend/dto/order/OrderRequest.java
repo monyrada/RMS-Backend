@@ -24,6 +24,7 @@ public class OrderRequest {
     private OrderSource source;
     private OrderStatus status;
     private Integer guestCount;
+    private String guestName;
     private BigDecimal subtotal;
     private BigDecimal discount;
     private BigDecimal tax;

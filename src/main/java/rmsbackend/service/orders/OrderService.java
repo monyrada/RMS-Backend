@@ -97,6 +97,7 @@ public class OrderService {
 
         // occupy the table
         table.setStatus(TableStatus.OCCUPIED);
+        table.setCurrentGuestName(order.getGuestName());
         restaurantTableRepository.save(table);
 
         log.info("Order {} created for table {}", order.getOrderNumber(), table.getId());
@@ -135,6 +136,15 @@ public class OrderService {
             }
         }
         if (request.getGuestCount() != null) order.setGuestCount(request.getGuestCount());
+        if (request.getGuestName() != null) {
+            order.setGuestName(request.getGuestName());
+
+            if (order.getTable().getStatus() == TableStatus.OCCUPIED) {
+                RestaurantTable table = order.getTable();
+                table.setCurrentGuestName(order.getGuestName());
+                restaurantTableRepository.save(table);
+            }
+        }
         if (request.getNote() != null) order.setNote(request.getNote());
 
         order = orderRepository.save(order);
@@ -240,6 +250,7 @@ public class OrderService {
             RestaurantTable table = restaurantTableRepository.findById(tableId)
                     .orElseThrow(() -> new ResourceNotFoundException("Table not found with id:" + tableId));
             table.setStatus(TableStatus.AVAILABLE);
+            table.setCurrentGuestName(null);
             restaurantTableRepository.save(table);
         }
     }
