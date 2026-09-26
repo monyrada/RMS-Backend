@@ -40,4 +40,4 @@ app:
     base-url: ${QR_BASE_URL:http://localhost:5173}
     image-size: ${QR_IMAGE_SIZE:320}
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:https://rms-test-tau.vercel.app,http://localhost:5173}
