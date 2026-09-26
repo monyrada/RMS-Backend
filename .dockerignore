@@ -1,0 +1,9 @@
+build/
+.gradle/
+.idea/
+.vscode/
+logs/
+*.log
+.git/
+.claude/
+HELP.md
