@@ -8,6 +8,7 @@ import rmsbackend.enums.UserStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @Getter
@@ -26,4 +27,7 @@ public class UserRequest {
     private LocalDate dateOfBirth;
     private UserStatus status;
     private Boolean enabled;
+
+    // role names, e.g. ["WAITER"]; null on update leaves the user's roles unchanged
+    private Set<String> roles;
 }

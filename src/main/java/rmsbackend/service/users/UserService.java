@@ -8,7 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import rmsbackend.common.exception.BusinessException;
 import rmsbackend.common.exception.ResourceNotFoundException;
+import rmsbackend.domain.roles.Role;
+import rmsbackend.enums.RoleName;
+import rmsbackend.enums.UserStatus;
+import rmsbackend.repository.roles.RoleRepository;
 import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.users.PasswordResetToken;
@@ -19,6 +24,8 @@ import rmsbackend.repository.users.PasswordResetTokenRepository;
 import rmsbackend.repository.users.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Transactional
@@ -30,6 +37,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
     private final PasswordResetTokenRepository resetTokenRepository;
 
     @Value("${app.password-reset.expiry-minutes:15}")
@@ -49,6 +57,7 @@ public class UserService {
                 .enabled(request.getEnabled())
                 .status(request.getStatus())
                 .build();
+        user.setRoles(resolveRoles(request.getRoles()));
 
         userRepository.save(user);
         log.info("User id {} has been created on date {}", user.getId(), user.getCreatedAt());
@@ -59,6 +68,8 @@ public class UserService {
     public UserResponse update(String id, UserRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+
+        boolean wasAdmin = isAdmin(user.getRoles());
 
         user.setUsername(request.getUsername());
         user.setFirstname(request.getFirstname());
@@ -71,10 +82,52 @@ public class UserService {
         user.setEnabled(request.getEnabled());
         user.setStatus(request.getStatus());
 
+        if (request.getRoles() != null) {
+            user.setRoles(resolveRoles(request.getRoles()));
+        }
+        guardLastAdmin(wasAdmin, user.getRoles(), user.getEnabled(), user.getStatus());
+
         userRepository.save(user);
         log.info("User id {} has been updated", user.getId());
 
         return userMapper.toResponse(user);
+    }
+
+    /** Resolves role names to enabled roles; rejects unknown or disabled names. */
+    private Set<Role> resolveRoles(Set<String> names) {
+        Set<Role> roles = new HashSet<>();
+        if (names == null) {
+            return roles;
+        }
+
+        for (String name : names) {
+            Role role = roleRepository.findByNameIgnoreCase(name)
+                    .orElseThrow(() -> new IllegalArgumentException("Role '" + name + "' does not exist"));
+            if (!Boolean.TRUE.equals(role.getEnabled())) {
+                throw new IllegalArgumentException("Role '" + name + "' is disabled");
+            }
+            roles.add(role);
+        }
+
+        return roles;
+    }
+
+    private boolean isAdmin(Set<Role> roles) {
+        return roles.stream().anyMatch(r -> RoleName.ADMIN.name().equalsIgnoreCase(r.getName()));
+    }
+
+    /**
+     * Prevents locking everyone out: the last ADMIN can't lose the role, be disabled or be deleted.
+     */
+    private void guardLastAdmin(boolean wasAdmin, Set<Role> newRoles, Boolean newEnabled, UserStatus newStatus) {
+        String admin = RoleName.ADMIN.name();
+        boolean staysActiveAdmin = Boolean.TRUE.equals(newEnabled)
+                && newStatus == UserStatus.ACTIVE
+                && newRoles.stream().anyMatch(r -> admin.equalsIgnoreCase(r.getName()));
+
+        if (wasAdmin && !staysActiveAdmin && userRepository.countByRoles_NameIgnoreCase(admin) <= 1) {
+            throw new BusinessException("Cannot remove, disable or delete the last ADMIN user.");
+        }
     }
 
     public Page<UserResponse> getAllUsers(PaginationRequest pagination) {
@@ -95,9 +148,12 @@ public class UserService {
     }
 
     public boolean delete(String id) {
-        if (!userRepository.existsById(id)) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
             return false;
         }
+
+        guardLastAdmin(isAdmin(user.getRoles()), Set.of(), false, UserStatus.INACTIVE);
 
         userRepository.deleteById(id);
         log.info("User id {} has been deleted", id);

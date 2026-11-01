@@ -2,11 +2,14 @@ package rmsbackend.domain.users;
 
 import jakarta.persistence.*;
 import lombok.*;
+import rmsbackend.domain.roles.Role;
 import rmsbackend.enums.Gender;
 import rmsbackend.enums.UserStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -50,6 +53,16 @@ public class User {
 
     @Builder.Default
     private Boolean enabled = true;
+
+    // EAGER: authorities are read outside a session when the JWT filter builds the principal
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    @Builder.Default
+    private Set<Role> roles = new HashSet<>();
 
     @PrePersist
     public void prePersist() {

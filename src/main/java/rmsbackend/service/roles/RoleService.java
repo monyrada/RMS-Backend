@@ -7,7 +7,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import rmsbackend.common.exception.BusinessException;
 import rmsbackend.common.exception.ResourceNotFoundException;
+import rmsbackend.enums.RoleName;
+import rmsbackend.repository.users.UserRepository;
 import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.util.PaginationUtils;
 import rmsbackend.domain.roles.Role;
@@ -24,6 +27,7 @@ import rmsbackend.specification.RoleSpecification;
 public class RoleService {
 
     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
     private final RoleMapper roleMapper;
 
     /**
@@ -61,6 +65,12 @@ public class RoleService {
                 && !request.getName().equalsIgnoreCase(role.getName())
                 && roleRepository.existsByNameIgnoreCase(request.getName())) {
             throw new IllegalArgumentException("Role with name '" + request.getName() + "' already exists");
+        }
+
+        if (RoleName.isSystemRole(role.getName())
+                && (!role.getName().equalsIgnoreCase(request.getName())
+                    || !Boolean.TRUE.equals(request.getEnabled()))) {
+            throw new BusinessException("System role '" + role.getName() + "' cannot be renamed or disabled");
         }
 
         role.setName(request.getName());
@@ -105,8 +115,16 @@ public class RoleService {
      * controller can respond with a plain 404 rather than an exception.
      */
     public boolean delete(String id) {
-        if (!roleRepository.existsById(id)) {
+        Role role = roleRepository.findById(id).orElse(null);
+        if (role == null) {
             return false;
+        }
+
+        if (RoleName.isSystemRole(role.getName())) {
+            throw new BusinessException("System role '" + role.getName() + "' cannot be deleted");
+        }
+        if (userRepository.existsByRoles_Id(id)) {
+            throw new BusinessException("Role '" + role.getName() + "' is still assigned to users");
         }
 
         roleRepository.deleteById(id);

@@ -20,4 +20,8 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
 
     boolean existsByPhoneNumber(String phone);
 
+    boolean existsByRoles_Id(String roleId);
+
+    long countByRoles_NameIgnoreCase(String roleName);
+
 }

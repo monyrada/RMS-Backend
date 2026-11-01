@@ -2,12 +2,12 @@ package rmsbackend.security;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import rmsbackend.domain.users.User;
 import rmsbackend.enums.UserStatus;
 
 import java.util.Collection;
-import java.util.List;
 
 @Getter
 public class UserPrincipal implements UserDetails {
@@ -28,7 +28,11 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return user.getRoles().stream()
+                .filter(role -> Boolean.TRUE.equals(role.getEnabled()) && role.getName() != null)
+                .map(role -> new SimpleGrantedAuthority(
+                        "ROLE_" + role.getName().trim().toUpperCase().replace(' ', '_')))
+                .toList();
     }
 
     @Override

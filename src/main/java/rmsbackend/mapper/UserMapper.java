@@ -1,9 +1,13 @@
 package rmsbackend.mapper;
 
 import org.springframework.stereotype.Component;
+import rmsbackend.domain.roles.Role;
 import rmsbackend.domain.users.User;
 import rmsbackend.dto.users.UserRequest;
 import rmsbackend.dto.users.UserResponse;
+
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @Component
 public class UserMapper {
@@ -43,6 +47,7 @@ public class UserMapper {
                 .dateOfBirth(user.getDateOfBirth())
                 .status(user.getStatus())
                 .enabled(user.getEnabled())
+                .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toCollection(TreeSet::new)))
                 .lastLoginAt(user.getLastLoginAt())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import rmsbackend.common.exception.ResourceNotFoundException;
@@ -100,6 +101,7 @@ public class UserController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
     @PutMapping("/{id}/change-password")
     @Operation(summary = "Change password", description = "Change password for an authenticated user")
     public RespondDTO changePassword(@PathVariable String id, @Valid @RequestBody ChangePasswordRequest request) {

@@ -6,6 +6,7 @@ import rmsbackend.enums.UserStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -25,6 +26,7 @@ public class UserResponse {
     private LocalDate dateOfBirth;
     private UserStatus status;
     private Boolean enabled;
+    private Set<String> roles;
 
     private LocalDateTime lastLoginAt;
     private LocalDateTime createdAt;
