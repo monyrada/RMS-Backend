@@ -1,6 +1,7 @@
 package rmsbackend.mapper;
 
 import org.springframework.stereotype.Component;
+import rmsbackend.domain.permissions.Permission;
 import rmsbackend.domain.roles.Role;
 import rmsbackend.domain.users.User;
 import rmsbackend.dto.users.UserRequest;
@@ -48,6 +49,11 @@ public class UserMapper {
                 .status(user.getStatus())
                 .enabled(user.getEnabled())
                 .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toCollection(TreeSet::new)))
+                .permissions(user.getRoles().stream()
+                        .filter(role -> Boolean.TRUE.equals(role.getEnabled()))
+                        .flatMap(role -> role.getPermissions().stream())
+                        .map(Permission::getCode)
+                        .collect(Collectors.toCollection(TreeSet::new)))
                 .lastLoginAt(user.getLastLoginAt())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())

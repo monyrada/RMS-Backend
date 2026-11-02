@@ -12,6 +12,7 @@ import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.generic.StatusCode;
 import rmsbackend.common.util.JSONRespond;
 import rmsbackend.dto.RespondDTO;
+import rmsbackend.dto.roles.RolePermissionRequest;
 import rmsbackend.dto.roles.RoleRequest;
 import rmsbackend.dto.roles.RoleResponse;
 import rmsbackend.service.roles.RoleService;
@@ -64,6 +65,14 @@ public class RoleController {
         if (role == null) {
             return JSONRespond.respond(null, StatusCode.NOT_FOUND, "Role not found!");
         }
+
+        return JSONRespond.respond(role, StatusCode.SUCCESS);
+    }
+
+    @PutMapping("/{id}/permissions")
+    @Operation(summary = "Update role permissions", description = "Replace the permissions granted to a role")
+    public RespondDTO updateRolePermissions(@PathVariable String id, @Valid @RequestBody RolePermissionRequest request) {
+        RoleResponse role = roleService.updatePermissions(id, request);
 
         return JSONRespond.respond(role, StatusCode.SUCCESS);
     }

@@ -16,5 +16,6 @@ public class UserSummaryResponse {
     private String email;
     private String fullName;
     private Set<String> roles;
+    private Set<String> permissions;
 
 }

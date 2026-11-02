@@ -2,6 +2,7 @@ package rmsbackend.mapper;
 
 import org.springframework.stereotype.Component;
 import rmsbackend.domain.auth.RefreshToken;
+import rmsbackend.domain.permissions.Permission;
 import rmsbackend.domain.roles.Role;
 import rmsbackend.domain.users.User;
 import rmsbackend.dto.auth.response.SessionResponse;
@@ -29,6 +30,11 @@ public class AuthMapper {
                 .roles(user.getRoles().stream()
                         .filter(role -> Boolean.TRUE.equals(role.getEnabled()))
                         .map(Role::getName)
+                        .collect(Collectors.toCollection(TreeSet::new)))
+                .permissions(user.getRoles().stream()
+                        .filter(role -> Boolean.TRUE.equals(role.getEnabled()))
+                        .flatMap(role -> role.getPermissions().stream())
+                        .map(Permission::getCode)
                         .collect(Collectors.toCollection(TreeSet::new)))
                 .build();
     }

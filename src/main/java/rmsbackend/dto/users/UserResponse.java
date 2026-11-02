@@ -27,6 +27,7 @@ public class UserResponse {
     private UserStatus status;
     private Boolean enabled;
     private Set<String> roles;
+    private Set<String> permissions;
 
     private LocalDateTime lastLoginAt;
     private LocalDateTime createdAt;

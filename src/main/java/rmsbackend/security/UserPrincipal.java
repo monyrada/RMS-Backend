@@ -4,10 +4,13 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import rmsbackend.domain.roles.Role;
 import rmsbackend.domain.users.User;
 import rmsbackend.enums.UserStatus;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Getter
 public class UserPrincipal implements UserDetails {
@@ -28,10 +31,20 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getRoles().stream()
+        List<Role> enabledRoles = user.getRoles().stream()
                 .filter(role -> Boolean.TRUE.equals(role.getEnabled()) && role.getName() != null)
+                .toList();
+
+        // Roles keep the ROLE_ prefix; permissions are exposed as their bare code (e.g. ORDER_VIEW).
+        Stream<GrantedAuthority> roleAuthorities = enabledRoles.stream()
                 .map(role -> new SimpleGrantedAuthority(
-                        "ROLE_" + role.getName().trim().toUpperCase().replace(' ', '_')))
+                        "ROLE_" + role.getName().trim().toUpperCase().replace(' ', '_')));
+        Stream<GrantedAuthority> permissionAuthorities = enabledRoles.stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(permission -> new SimpleGrantedAuthority(permission.getCode()));
+
+        return Stream.concat(roleAuthorities, permissionAuthorities)
+                .distinct()
                 .toList();
     }
 

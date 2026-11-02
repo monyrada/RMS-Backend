@@ -9,7 +9,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import rmsbackend.common.exception.BusinessException;
 import rmsbackend.common.exception.ResourceNotFoundException;
+import rmsbackend.domain.permissions.Permission;
+import rmsbackend.dto.roles.RolePermissionRequest;
+import rmsbackend.enums.PermissionName;
 import rmsbackend.enums.RoleName;
+import rmsbackend.repository.permissions.PermissionRepository;
 import rmsbackend.repository.users.UserRepository;
 import rmsbackend.common.generic.PaginationRequest;
 import rmsbackend.common.util.PaginationUtils;
@@ -20,6 +24,11 @@ import rmsbackend.mapper.RoleMapper;
 import rmsbackend.repository.roles.RoleRepository;
 import rmsbackend.specification.RoleSpecification;
 
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 @Transactional
 @Slf4j
 @Service
@@ -28,6 +37,7 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final PermissionRepository permissionRepository;
     private final RoleMapper roleMapper;
 
     /**
@@ -79,6 +89,37 @@ public class RoleService {
 
         roleRepository.save(role);
         log.info("Role id {} has been updated", role.getId());
+
+        return roleMapper.toResponse(role);
+    }
+
+    /**
+     * Replaces the permission set of a role.
+     * Unknown codes are rejected, and ADMIN must keep the permissions that manage users and roles
+     * so the last administrator can never lock themselves out.
+     */
+    public RoleResponse updatePermissions(String id, RolePermissionRequest request) {
+        Role role = roleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with ID: " + id));
+
+        Set<String> codes = request.getPermissions();
+        List<Permission> found = permissionRepository.findByCodeIn(codes);
+        if (found.size() != codes.size()) {
+            Set<String> known = found.stream().map(Permission::getCode).collect(Collectors.toSet());
+            Set<String> unknown = new TreeSet<>(codes);
+            unknown.removeAll(known);
+            throw new IllegalArgumentException("Unknown permissions: " + unknown);
+        }
+
+        if (RoleName.ADMIN.name().equalsIgnoreCase(role.getName())
+                && !codes.containsAll(Set.of(PermissionName.USER_MANAGE.name(), PermissionName.ROLE_MANAGE.name()))) {
+            throw new BusinessException("ADMIN role must keep USER_MANAGE and ROLE_MANAGE");
+        }
+
+        role.getPermissions().clear();
+        role.getPermissions().addAll(found);
+        roleRepository.save(role);
+        log.info("Role id {} permissions updated to {}", role.getId(), codes);
 
         return roleMapper.toResponse(role);
     }

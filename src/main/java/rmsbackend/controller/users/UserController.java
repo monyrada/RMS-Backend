@@ -101,7 +101,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
+    @PreAuthorize("hasAuthority('USER_MANAGE') or #id == principal.id")
     @PutMapping("/{id}/change-password")
     @Operation(summary = "Change password", description = "Change password for an authenticated user")
     public RespondDTO changePassword(@PathVariable String id, @Valid @RequestBody ChangePasswordRequest request) {
